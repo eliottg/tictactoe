@@ -8,21 +8,25 @@ import static org.junit.Assert.*;
  */
 public class MoveTest{
 
+    private Move move;
+
+    @Before
+    public void setUp() {
+        move = new Move(0, 1, "X");
+    }
+
     @Test
     public void testGetRow() {
-        Move move = new Move(0, 1, "X");
         assertEquals(0, move.getRow());
     }
 
     @Test
     public void testGetCol() {
-        Move move = new Move(0, 1, "X");
         assertEquals(1, move.getCol());
     }
 
     @Test
     public void testGetToken() {
-        Move move = new Move(0, 1, "X");
         assertEquals("X", move.getToken());
     }
 }

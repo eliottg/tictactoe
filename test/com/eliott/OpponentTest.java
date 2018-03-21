@@ -8,16 +8,22 @@ import static org.junit.Assert.*;
  */
 public class OpponentTest {
 
+    private Opponent opponent;
+    private Board board;
+
+    @Before
+    public void setUp() {
+        opponent = new Opponent("X");
+        board = new Board();
+    }
+
     @Test
     public void testSetDifficulty() {
-        Opponent opponent = new Opponent("X");
         opponent.setDifficulty(1);
     }
 
     @Test
     public void testGetWinningEasyMove() {
-        Board board = new Board();
-        Opponent opponent = new Opponent("X");
         board.setBoardMatrix(new String[][]{
                 {"X", " ", " "},
                 {" ", " ", " "},
@@ -30,8 +36,6 @@ public class OpponentTest {
 
     @Test
     public void testGetEasyMoveInEmptyBoard() {
-        Board board = new Board();
-        Opponent opponent = new Opponent("X");
         Move move = opponent.getEasyMove(board, "X");
         assertEquals("X", move.getToken());
         assertNotNull(move.getRow());
@@ -40,8 +44,6 @@ public class OpponentTest {
 
     @Test
     public void testGetRandomMove_lastAvailableMove() {
-        Board board = new Board();
-        Opponent opponent = new Opponent("X");
         board.setBoardMatrix(new String[][]{
                 {"X", " ", "X"},
                 {"X", "X", "X"},
@@ -54,8 +56,6 @@ public class OpponentTest {
 
     @Test
     public void testGetRandomMove_emptyBoard(){
-        Board board = new Board();
-        Opponent opponent = new Opponent("X");
         Move move = opponent.getRandomMove(board, "X");
         assertEquals("X", move.getToken());
         assertNotNull(move.getRow());

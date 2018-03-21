@@ -24,17 +24,6 @@ public class GameTest{
         board = new Board();
     }
 
-//    public void testStartGame(){
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        String testInputString = "0";
-//        System.setIn(new ByteArrayInputStream(testInputString.getBytes()));
-//        System.setOut(new PrintStream(baos));
-//        game.startGame();
-//        String outString = baos.toString();
-//        String expectedString = "Would you like to play a game?\r\n";
-//        assertEquals(expectedString, outString);
-//    }
-
     @Test
     public void testGetUserStartingChoice_easy(){
         String testInputString = "0";
