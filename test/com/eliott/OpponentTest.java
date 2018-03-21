@@ -1,17 +1,20 @@
 package com.eliott;
 
-import junit.framework.TestCase;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 /**
  * Created by egray on 2/20/2018.
  */
-public class OpponentTest extends TestCase {
+public class OpponentTest {
 
+    @Test
     public void testSetDifficulty() {
         Opponent opponent = new Opponent("X");
         opponent.setDifficulty(1);
     }
 
+    @Test
     public void testGetWinningEasyMove() {
         Board board = new Board();
         Opponent opponent = new Opponent("X");
@@ -25,6 +28,7 @@ public class OpponentTest extends TestCase {
         assertEquals("X", winningMove.getToken());
     }
 
+    @Test
     public void testGetEasyMoveInEmptyBoard() {
         Board board = new Board();
         Opponent opponent = new Opponent("X");
@@ -34,6 +38,7 @@ public class OpponentTest extends TestCase {
         assertNotNull(move.getCol());
     }
 
+    @Test
     public void testGetRandomMove_lastAvailableMove() {
         Board board = new Board();
         Opponent opponent = new Opponent("X");
@@ -47,6 +52,7 @@ public class OpponentTest extends TestCase {
         assertEquals(1, move.getCol());
     }
 
+    @Test
     public void testGetRandomMove_emptyBoard(){
         Board board = new Board();
         Opponent opponent = new Opponent("X");

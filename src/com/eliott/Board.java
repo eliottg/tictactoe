@@ -53,7 +53,7 @@ class Board {
     String getGameState() {
         if (isVictory()) {
             return "Win";
-        } else if (isFull()) {
+        } else if (boardIsFull()) {
             return "Tie";
         } else {
             return "Ongoing";
@@ -92,7 +92,7 @@ class Board {
         return rowIsIdentical && rowIsNotEmpty;
     }
 
-    boolean isFull() {
+    boolean boardIsFull() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (boardMatrix[i][j].equals(" ")){

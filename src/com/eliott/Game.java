@@ -107,9 +107,7 @@ class Game {
                 printBoard(board);
                 System.out.println("It's a tie. :-/\r\n");
             }
-
             playerTurn = !playerTurn;
-
         }
     }
 }

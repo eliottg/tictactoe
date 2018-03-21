@@ -1,16 +1,16 @@
 package com.eliott;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.*;
 
 /**
  * Created by egray on 2/20/2018.
  */
 
-//todo add test for looking for 3-in-a-row opportunities with more than one token type in a row.
 
-public class BoardTest extends TestCase {
+public class BoardTest{
 
-
+    @Test
     public void testNewBoardCellsAreNull() {
         Board board = new Board();
         String[][] boardMatrix = board.getBoardMatrix();
@@ -21,6 +21,7 @@ public class BoardTest extends TestCase {
         }
     }
 
+    @Test
     public void testSetBoardmatrix() {
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -32,6 +33,7 @@ public class BoardTest extends TestCase {
         assertEquals("X", board.getBoardMatrix()[2][0]);
     }
 
+    @Test
     public void testMoveSuccess() {
         Board board = new Board();
         Move move = new Move(0, 0, "X");
@@ -39,6 +41,7 @@ public class BoardTest extends TestCase {
         assertEquals(board.getBoardMatrix()[0][0], "X");
     }
 
+    @Test
     public void testMoveIsInvalid() {
         Board board = new Board();
         Move firstMove = new Move(0, 0, "X");
@@ -47,6 +50,7 @@ public class BoardTest extends TestCase {
         assertFalse(board.moveIsValid(secondMove));
     }
 
+    @Test
     public void testMoveIsValid() {
         Board board = new Board();
         Move firstMove = new Move(0, 0, "X");
@@ -55,6 +59,7 @@ public class BoardTest extends TestCase {
         assertTrue(board.moveIsValid(secondMove));
     }
 
+    @Test
     public void testGetListOfAvailableMoves_almostFullBoard(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -64,6 +69,7 @@ public class BoardTest extends TestCase {
         assertEquals(1, board.getListOfAvailableMoves().size());
     }
 
+    @Test
     public void testGetListOfAvailableMoves_emptyBoard(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -73,6 +79,7 @@ public class BoardTest extends TestCase {
         assertEquals(9, board.getListOfAvailableMoves().size());
     }
 
+    @Test
     public void testGetGameState_Ongoing() {
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -82,6 +89,7 @@ public class BoardTest extends TestCase {
         assertEquals("Ongoing", board.getGameState());
     }
 
+    @Test
     public void testGetGameState_Win() {
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -91,6 +99,7 @@ public class BoardTest extends TestCase {
         assertEquals("Win", board.getGameState());
     }
 
+    @Test
     public void testGetGameState_Tied() {
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -100,6 +109,7 @@ public class BoardTest extends TestCase {
         assertEquals("Tie", board.getGameState());
     }
 
+    @Test
     public void testIsVictory_true(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -109,7 +119,7 @@ public class BoardTest extends TestCase {
         assertTrue(board.isVictory());
     }
 
-
+    @Test
     public void testIsRowVictory_false(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -119,6 +129,7 @@ public class BoardTest extends TestCase {
         assertFalse(board.isVictory());
     }
 
+    @Test
     public void testIsColumnVictory_true(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -128,6 +139,7 @@ public class BoardTest extends TestCase {
         assertTrue(board.isVictory());
     }
 
+    @Test
     public void testIsColumnVictory_false(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -137,7 +149,7 @@ public class BoardTest extends TestCase {
         assertFalse(board.isVictory());
     }
 
-
+    @Test
     public void testIsDiagonalVictory_forward(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -147,6 +159,7 @@ public class BoardTest extends TestCase {
         assertTrue(board.isVictory());
     }
 
+    @Test
     public void testIsDiagonalVictory_backward(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -156,6 +169,7 @@ public class BoardTest extends TestCase {
         assertTrue(board.isVictory());
     }
 
+    @Test
     public void testIsDiagonalVictory_false(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -165,36 +179,41 @@ public class BoardTest extends TestCase {
         assertFalse(board.isVictory());
     }
 
+    @Test
     public void testCheckRowForVictory_true(){
         Board board = new Board();
         String[] row = new String[]{"X", "X", "X"};
         assertTrue(board.checkRowForVictory(row));
     }
 
+    @Test
     public void testCheckRowForVictory_false(){
         Board board = new Board();
         String[] row = new String[]{"X", "O", "X"};
         assertFalse(board.checkRowForVictory(row));
     }
 
-    public void testIsFull_fullBoard(){
+    @Test
+    public void testBoardIsFull_fullBoard(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
                 {"O", "X", "X"},
                 {"X", "O", "O"},
                 {"X", "O", "X"}});
-        assertTrue(board.isFull());
+        assertTrue(board.boardIsFull());
     }
 
-    public void testIsFull_notFullBoard(){
+    @Test
+    public void testBoardIsFull_notFullBoard(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
                 {"O", "X", "X"},
                 {"X", "O", "O"},
                 {"X", "O", "X"}});
-        assertTrue(board.isFull());
+        assertTrue(board.boardIsFull());
     }
 
+    @Test
     public void testSearchBoardForWinningMove_withPossibleRowWin(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -207,6 +226,7 @@ public class BoardTest extends TestCase {
         assertEquals("X", winningMove.getToken());
     }
 
+    @Test
     public void testSearchBoardForWinningMove_withPossibleColumnWin(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -219,6 +239,7 @@ public class BoardTest extends TestCase {
         assertEquals("X", winningMove.getToken());
     }
 
+    @Test
     public void testSearchBoardForWinningMove_withPossibleForwardDiagonalWin(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -231,6 +252,7 @@ public class BoardTest extends TestCase {
         assertEquals("X", winningMove.getToken());
     }
 
+    @Test
     public void testSearchBoardForWinningMove_withPossibleBackwardDiagonalWin(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -243,6 +265,7 @@ public class BoardTest extends TestCase {
         assertEquals("X", winningMove.getToken());
     }
 
+    @Test
     public void testGetWinningCoords_failure(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -253,6 +276,7 @@ public class BoardTest extends TestCase {
         assertNull(winningMove);
     }
 
+    @Test
     public void testFindThreeInARow_success(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -266,6 +290,7 @@ public class BoardTest extends TestCase {
         assertEquals("X", move.getToken());
     }
 
+    @Test
     public void testFindThreeInARow_failureWithBothTokens(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
@@ -277,6 +302,7 @@ public class BoardTest extends TestCase {
         assertNull(move);
     }
 
+    @Test
     public void testFindThreeInARow_failure(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{

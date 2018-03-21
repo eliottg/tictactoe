@@ -1,9 +1,7 @@
 package com.eliott;
 
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.*;
+import org.junit.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,7 +9,6 @@ import java.io.PrintStream;
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.*;
 
 /**
  * Created by egray on 3/20/2018.
