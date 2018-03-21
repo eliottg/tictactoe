@@ -118,10 +118,6 @@ public class GameTest{
         System.setIn(new ByteArrayInputStream(testInputString.getBytes()));
         game.getMoveFromPlayer(board);
     }
-//
-//    public void testEasyGame() {
-//
-//    }
 
     @After
     public void tearDown() throws Exception {

@@ -34,23 +34,23 @@ public class BoardTest extends TestCase {
 
     public void testMoveSuccess() {
         Board board = new Board();
-        Move move = new Move(0, 0, "X", true);
+        Move move = new Move(0, 0, "X");
         board.addMove(move);
         assertEquals(board.getBoardMatrix()[0][0], "X");
     }
 
     public void testMoveIsInvalid() {
         Board board = new Board();
-        Move firstMove = new Move(0, 0, "X", false);
-        Move secondMove = new Move(0, 0, "O", false);
+        Move firstMove = new Move(0, 0, "X");
+        Move secondMove = new Move(0, 0, "O");
         board.addMove(firstMove);
         assertFalse(board.moveIsValid(secondMove));
     }
 
     public void testMoveIsValid() {
         Board board = new Board();
-        Move firstMove = new Move(0, 0, "X", false);
-        Move secondMove = new Move(1, 0, "O", false);
+        Move firstMove = new Move(0, 0, "X");
+        Move secondMove = new Move(1, 0, "O");
         board.addMove(firstMove);
         assertTrue(board.moveIsValid(secondMove));
     }
@@ -205,7 +205,6 @@ public class BoardTest extends TestCase {
         assertEquals(0, winningMove.getRow());
         assertEquals(2, winningMove.getCol());
         assertEquals("X", winningMove.getToken());
-        assertTrue(winningMove.isWinningMove());
     }
 
     public void testSearchBoardForWinningMove_withPossibleColumnWin(){
@@ -218,7 +217,6 @@ public class BoardTest extends TestCase {
         assertEquals(2, winningMove.getRow());
         assertEquals(0, winningMove.getCol());
         assertEquals("X", winningMove.getToken());
-        assertTrue(winningMove.isWinningMove());
     }
 
     public void testSearchBoardForWinningMove_withPossibleForwardDiagonalWin(){
@@ -231,7 +229,6 @@ public class BoardTest extends TestCase {
         assertEquals(2, winningMove.getRow());
         assertEquals(2, winningMove.getCol());
         assertEquals("X", winningMove.getToken());
-        assertTrue(winningMove.isWinningMove());
     }
 
     public void testSearchBoardForWinningMove_withPossibleBackwardDiagonalWin(){
@@ -244,7 +241,6 @@ public class BoardTest extends TestCase {
         assertEquals(1, winningMove.getRow());
         assertEquals(1, winningMove.getCol());
         assertEquals("X", winningMove.getToken());
-        assertTrue(winningMove.isWinningMove());
     }
 
     public void testGetWinningCoords_failure(){
@@ -254,12 +250,8 @@ public class BoardTest extends TestCase {
                 {" ", " ", ""},
                 {"X", " ", " "}});
         Move winningMove = board.searchBoardForWinningMove("O");
-        assertEquals(-1, winningMove.getRow());
-        assertEquals(-1, winningMove.getCol());
-        assertEquals("O", winningMove.getToken());
-        assertFalse(winningMove.isWinningMove());
+        assertNull(winningMove);
     }
-
 
     public void testFindThreeInARow_success(){
         Board board = new Board();
@@ -272,21 +264,27 @@ public class BoardTest extends TestCase {
         assertEquals(0, move.getRow());
         assertEquals(2, move.getCol());
         assertEquals("X", move.getToken());
-        assertTrue(move.isWinningMove());
+    }
+
+    public void testFindThreeInARow_failureWithBothTokens(){
+        Board board = new Board();
+        board.setBoardMatrix(new String[][]{
+                {"X", "X", "O"},
+                {" ", " ", " "},
+                {" ", " ", " "}});
+        int[][] rowCoordinates = new int[][]{{0, 0}, {0, 1}, {0, 2}};
+        Move move = board.findTwoInARow("X", rowCoordinates);
+        assertNull(move);
     }
 
     public void testFindThreeInARow_failure(){
         Board board = new Board();
         board.setBoardMatrix(new String[][]{
-                {"X", "X", " "},
+                {"O", "O", " "},
                 {" ", " ", " "},
                 {" ", " ", " "}});
         int[][] rowCoordinates = new int[][]{{0, 0}, {0, 1}, {0, 2}};
-        Move move = board.findTwoInARow("O", rowCoordinates);
-        assertEquals(-1, move.getRow());
-        assertEquals(-1, move.getCol());
-        assertEquals("O", move.getToken());
-        assertFalse(move.isWinningMove());
+        Move move = board.findTwoInARow("X", rowCoordinates);
+        assertNull(move);
     }
-
 }

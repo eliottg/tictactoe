@@ -23,7 +23,6 @@ public class OpponentTest extends TestCase {
         assertEquals(1, winningMove.getRow());
         assertEquals(0, winningMove.getCol());
         assertEquals("X", winningMove.getToken());
-        assertTrue(winningMove.isWinningMove());
     }
 
     public void testGetEasyMoveInEmptyBoard() {
@@ -33,7 +32,6 @@ public class OpponentTest extends TestCase {
         assertEquals("X", move.getToken());
         assertNotNull(move.getRow());
         assertNotNull(move.getCol());
-        assertFalse(move.isWinningMove());
     }
 
     public void testGetRandomMove_lastAvailableMove() {

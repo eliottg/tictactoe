@@ -20,7 +20,7 @@ class Opponent {
 
     Move getEasyMove(Board board, String token) {
         Move move = board.searchBoardForWinningMove(token);
-        if (move.isWinningMove()){
+        if (move != null){
             return move;
         } else {
             return getRandomMove(board, token);
@@ -34,7 +34,7 @@ class Opponent {
         int row = availableMoves.get(randomMoveId)[0];
         int col = availableMoves.get(randomMoveId)[1];
 
-        return new Move(row, col, token, false);
+        return new Move(row, col, token);
     }
 
 

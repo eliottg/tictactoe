@@ -109,13 +109,13 @@ class Board {
         for (int i = 0; i < 3; i++) {
             int[][] rowCoordinates = new int[][]{{i, 0}, {i, 1}, {i, 2}};
             move = findTwoInARow(token, rowCoordinates);
-            if (move.isWinningMove()){
+            if (move != null){
                 return move;
             }
 
             int[][] columnCoordinates = new int[][]{{0, i},{1, i},{2, i}};
             move = findTwoInARow(token, columnCoordinates);
-            if (move.isWinningMove()){
+            if (move != null){
                 return move;
             }
         }
@@ -123,17 +123,17 @@ class Board {
         // check Diagonals
         int[][] forwardDiagonalCoords = new int[][]{{0, 0},{1, 1},{2, 2}};
         move = findTwoInARow(token, forwardDiagonalCoords);
-        if (move.isWinningMove()){
+        if(move != null){
             return move;
         }
 
         int[][] backwardDiagonalCoords = new int[][]{{0, 2},{1, 1},{2, 0}};
         move = findTwoInARow(token, backwardDiagonalCoords);
-        if (move.isWinningMove()){
+        if(move != null){
             return move;
         }
 
-        return new Move(-1, -1, token, false);
+        return null;
     }
 
 
@@ -159,8 +159,8 @@ class Board {
         }
         if (tokenCounter == 2 && emptyCounter == 1){
             winningCoordinates = rowColOrDiagonal[emptyIndex];
-            return new Move(winningCoordinates[0], winningCoordinates[1], token, true);
+            return new Move(winningCoordinates[0], winningCoordinates[1], token);
         }
-        return new Move(-1, -1, token, false);
+        return null;
     }
 }

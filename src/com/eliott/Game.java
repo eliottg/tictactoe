@@ -59,13 +59,13 @@ class Game {
     }
 
     Move getMoveFromPlayer(Board board){
-        Move move = new Move(-1, -1, "X", false);
+        Move move = new Move(-1, -1, "X");
         while(!board.moveIsValid(move)){
             System.out.print("Enter a valid move: row then column. e.g. 2 2\r\n>");
             Scanner sc = new Scanner(System.in);
             int row = sc.nextInt()-1;
             int column = sc.nextInt()-1;
-            move = new Move(row, column, "X", false);
+            move = new Move(row, column, "X");
         }
         return move;
     }
