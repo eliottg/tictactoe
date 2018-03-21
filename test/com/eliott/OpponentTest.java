@@ -16,9 +16,9 @@ public class OpponentTest extends TestCase {
         Board board = new Board();
         Opponent opponent = new Opponent("X");
         board.setBoardMatrix(new String[][]{
-                {"X", "", ""},
-                {"", "", ""},
-                {"X", "", ""}});
+                {"X", " ", " "},
+                {" ", " ", " "},
+                {"X", " ", " "}});
         Move winningMove = opponent.getEasyMove(board, "X");
         assertEquals(1, winningMove.getRow());
         assertEquals(0, winningMove.getCol());
@@ -40,7 +40,7 @@ public class OpponentTest extends TestCase {
         Board board = new Board();
         Opponent opponent = new Opponent("X");
         board.setBoardMatrix(new String[][]{
-                {"X", "", "X"},
+                {"X", " ", "X"},
                 {"X", "X", "X"},
                 {"X", "X", "X"}});
         Move move = opponent.getRandomMove(board, "X");

@@ -13,7 +13,7 @@ class Board {
         boardMatrix = new String[3][3];
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                boardMatrix[i][j] = "";
+                boardMatrix[i][j] = " ";
             }
         }
     }
@@ -35,14 +35,14 @@ class Board {
     boolean moveIsValid(Move move) {
         int row = move.getRow();
         int col = move.getCol();
-        return row < 3 && row >= 0 && col < 3 && col >= 0 && boardMatrix[row][col].equals("");
+        return row < 3 && row >= 0 && col < 3 && col >= 0 && boardMatrix[row][col].equals(" ");
     }
 
     ArrayList<int[]> getListOfAvailableMoves(){
         ArrayList<int[]> availableMoves = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if(boardMatrix[i][j].equals("")){
+                if(boardMatrix[i][j].equals(" ")){
                     availableMoves.add(new int[]{i, j});
                 }
             }
@@ -88,14 +88,14 @@ class Board {
 
     boolean checkRowForVictory(String[] row) {
         boolean rowIsIdentical = row[0].equals(row[1]) && row[1].equals(row[2]);
-        boolean rowIsNotEmpty = !row[0].equals("");
+        boolean rowIsNotEmpty = !row[0].equals(" ");
         return rowIsIdentical && rowIsNotEmpty;
     }
 
     boolean isFull() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (boardMatrix[i][j].equals("")){
+                if (boardMatrix[i][j].equals(" ")){
                     return false;
                 }
             }
@@ -142,6 +142,7 @@ class Board {
         int boardRowCoordinate;
         int boardColumnCoordinate;
         int tokenCounter = 0;
+        int emptyCounter = 0;
         int emptyIndex = 0;
         int[] winningCoordinates;
 
@@ -151,11 +152,12 @@ class Board {
             boardCell = boardMatrix[boardRowCoordinate][boardColumnCoordinate];
             if (boardCell.equals(token)){
                 tokenCounter++;
-            } else if (boardCell.equals("")){
+            } else if (boardCell.equals(" ")){
+                emptyCounter++;
                 emptyIndex = i;
             }
         }
-        if (tokenCounter == 2){
+        if (tokenCounter == 2 && emptyCounter == 1){
             winningCoordinates = rowColOrDiagonal[emptyIndex];
             return new Move(winningCoordinates[0], winningCoordinates[1], token, true);
         }
