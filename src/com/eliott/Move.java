@@ -3,6 +3,7 @@ package com.eliott;
 /**
  * Created by egray on 2/21/2018.
  */
+
 class Move {
 
     private int row;

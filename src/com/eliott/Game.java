@@ -1,113 +1,105 @@
 package com.eliott;
 
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Created by egray on 3/20/2018.
+ * Created by egray on 2/20/2018.
  */
 class Game {
 
-    void startGame(){
+    private int difficultyValue;
+    private String computerToken;
+    private String playerToken;
+    Board board;
 
-        while (true){
-            printWelcome();
-            int selection = -1;
-            while(selection < 0 || selection > 2) {
-                selection = getUserStartingChoice();
-            }
-            if (selection == 0){
-                easyGame();
-            } else if(selection == 1){
-                System.out.println("---ERROR: not implemented yet.");
-            } else {
-                System.out.println("Bye!");
-                System.exit(0);
-            }
+    Game(int difficultyValue, String playerToken, String computerToken){
+        this.difficultyValue = difficultyValue;
+        this.board = new Board();
+        this.playerToken = playerToken;
+        this.computerToken = computerToken;
+    }
+
+    boolean moveIsValid(Move move) {
+        int row = move.getRow();
+        int col = move.getCol();
+        return row < 3 && row >= 0 && col < 3 && col >= 0 && board.getBoardMatrix()[row][col].equals(" ");
+    }
+
+    void makeComputerMove() {
+        Move move = new Move(-1, -1, computerToken);  //todo Remove this invalid move creation hack.
+        if (difficultyValue == 1) {
+            move = getEasyMove();
+        } else if (difficultyValue == 2) {
+            move = getHardMove();
+        } else if (difficultyValue == 3) {
+            move = getImpossibleMove();
         }
-
+        board.addMove(move);
     }
 
-    int getUserStartingChoice(){
-        Scanner sc = new Scanner(System.in);
-        int value = sc.nextInt();
-        return value;
-    }
-
-    void printWelcome(){
-        String welcomeString = "Would you like to play a game?\r\n"
-                + "0)  Easy\r\n"
-                + "1) 'Hard' (Impossible)\r\n"
-                + "2)  Quit Game\r\n"
-                + ">";
-        System.out.print(welcomeString);
-    }
-
-    void printBoard(Board board){
-        String[][] boardMatrix = board.getBoardMatrix();
-        String header = "    1   2   3";
-        String highLowSep = "   -----------";
-        String row = "%d | %s | %s | %s |";
-        String rowSep = "  |---+---+---|";
-        System.out.println(header);
-        System.out.println(highLowSep);
-        System.out.println(String.format(row, 1, boardMatrix[0][0], boardMatrix[0][1], boardMatrix[0][2]));
-        System.out.println(rowSep);
-        System.out.println(String.format(row, 2, boardMatrix[1][0], boardMatrix[1][1], boardMatrix[1][2]));
-        System.out.println(rowSep);
-        System.out.println(String.format(row, 3, boardMatrix[2][0], boardMatrix[2][1], boardMatrix[2][2]));
-        System.out.println(highLowSep);
-    }
-
-    Move getMoveFromPlayer(Board board){
-        Move move = new Move(-1, -1, "X");
-        while(!board.moveIsValid(move)){
-            System.out.print("Enter a valid move: row then column. e.g. 2 2\r\n>");
-            Scanner sc = new Scanner(System.in);
-            int row = sc.nextInt()-1;
-            int column = sc.nextInt()-1;
-            move = new Move(row, column, "X");
-        }
-        return move;
-    }
-
-    void easyGame(){
-        Board board = new Board();
-        Opponent opponent = new Opponent("O");
-        boolean playerTurn = true;
-        if(Math.random() < 0.5){
-            System.out.println("Coin toss... Tails! Computer goes first!");
-            Move randomMove = opponent.getEasyMove(board, "O");
-            board.addMove(randomMove);
-        } else{
-            System.out.println("Coin toss... Heads! Player goes first!");
-
-        }
-        while(board.getGameState().equals("Ongoing")){
-            if(playerTurn){
-                printBoard(board);
-                Move move = getMoveFromPlayer(board);
-                board.addMove(move);
-                printBoard(board);
-            } else {
-                Move randomMove = opponent.getEasyMove(board, "O");
-                System.out.println("Computer turn...\n");
-                board.addMove(randomMove);
-            }
-            if (board.getGameState().equals("Win")){
-                if (playerTurn) {
-                    printBoard(board);
-                    System.out.println("You win!! :-D\r\n");
-                }
-                else {
-                    printBoard(board);
-                    System.out.println("You lose!! :-(\r\n");
-                }
-                break;
-            } else if (board.getGameState().equals("Tie")){
-                printBoard(board);
-                System.out.println("It's a tie. :-/\r\n");
-            }
-            playerTurn = !playerTurn;
+    void makeManualMove(Move move){
+        if (moveIsValid(move)){
+            board.addMove(move);
+        } else {
+            throw new IllegalStateException("Invalid move made. Validity should be checked earlier.");
         }
     }
+
+    Move getEasyMove() {
+        Move move = board.searchBoardForWinningMove(computerToken);
+        if (move != null){
+            return move;
+        }
+
+        return getRandomMove();
+    }
+
+    Move getRandomMove() {
+        ArrayList<int[]> availableMoves = board.getListOfAvailableMoves();
+        int availableMoveCount = availableMoves.size();
+        int randomMoveId = ThreadLocalRandom.current().nextInt(0, availableMoveCount);
+        int row = availableMoves.get(randomMoveId)[0];
+        int col = availableMoves.get(randomMoveId)[1];
+
+        return new Move(row, col, computerToken);
+    }
+
+    Move getHardMove() {
+        Move move;
+
+        move = board.searchBoardForWinningMove(computerToken); // Find computer win.
+        if (move!= null) {
+            return move;
+        }
+
+        move = board.searchBoardForWinningMove(playerToken); // Block player win.
+        if (move != null) {
+            return new Move(move.getRow(), move.getCol(), computerToken); //Todo have to hack this to reuse the winning move method, which auto-creates the same move as the input token.
+        }
+
+        return getRandomMove();
+    }
+
+    Move getImpossibleMove() {
+        Move move;
+
+        move = board.searchBoardForWinningMove(computerToken); // Find computer win.
+        if (move!= null) {
+            return move;
+        }
+
+        move = board.searchBoardForWinningMove(playerToken); // Block player win.
+        if (move != null) {
+            return new Move(move.getRow(), move.getCol(), computerToken); //Todo have to hack this to reuse the winning move method, which auto-creates the same move as the input token.
+        }
+
+        //todo: Implement check for possible forks
+        //todo: Check for blocking forks
+        //todo: Check for priority of remaining moves: Center, opposite corner, empty corner, empty side
+
+        return getRandomMove(); //todo: Deprecate.
+    }
+
+
 }

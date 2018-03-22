@@ -32,12 +32,6 @@ class Board {
         boardMatrix[row][col] = token;
     }
 
-    boolean moveIsValid(Move move) {
-        int row = move.getRow();
-        int col = move.getCol();
-        return row < 3 && row >= 0 && col < 3 && col >= 0 && boardMatrix[row][col].equals(" ");
-    }
-
     ArrayList<int[]> getListOfAvailableMoves(){
         ArrayList<int[]> availableMoves = new ArrayList<>();
         for (int i = 0; i < 3; i++) {

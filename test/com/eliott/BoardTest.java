@@ -45,22 +45,6 @@ public class BoardTest{
     }
 
     @Test
-    public void testMoveIsValid_false() {
-        Move firstMove = new Move(0, 0, "X");
-        Move secondMove = new Move(0, 0, "O");
-        board.addMove(firstMove);
-        assertFalse(board.moveIsValid(secondMove));
-    }
-
-    @Test
-    public void testMoveIsValid_true() {
-        Move firstMove = new Move(0, 0, "X");
-        Move secondMove = new Move(1, 0, "O");
-        board.addMove(firstMove);
-        assertTrue(board.moveIsValid(secondMove));
-    }
-
-    @Test
     public void testGetListOfAvailableMoves_almostFullBoard(){
         board.setBoardMatrix(new String[][]{
                 {"X", " ", "X"},
