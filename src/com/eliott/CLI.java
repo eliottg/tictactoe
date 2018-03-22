@@ -1,5 +1,6 @@
 package com.eliott;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -23,11 +24,15 @@ class CLI {
     }
 
     private int getUserStartingChoice(){
-        Scanner sc = new Scanner(System.in);
         int selection = -1;
         while(selection < 1 || selection > 4) {
-            printWelcome();
-            selection = sc.nextInt(); //todo handle string inputs.
+            try{
+                Scanner sc = new Scanner(System.in);
+                printWelcome();
+                selection = sc.nextInt(); //todo handle string inputs.
+            } catch (InputMismatchException e){
+                System.out.println("Error - enter a listed number.");
+            }
         }
         return selection;
     }
@@ -56,16 +61,21 @@ class CLI {
         System.out.println(rowSep);
         System.out.println(String.format(row, 3, boardMatrix[2][0], boardMatrix[2][1], boardMatrix[2][2]));
         System.out.println(highLowSep);
+        System.out.println();
     }
 
     private Move getMoveFromPlayer(){
         Move move = new Move(-1, -1, "X");  //todo Remove this invalid move creation hack.
         while(!game.moveIsValid(move)){
-            System.out.print("Enter a valid move: row then column. e.g. 2 2\r\n>");
-            Scanner sc = new Scanner(System.in);
-            int row = sc.nextInt()-1;   //todo handle string inputs.
-            int column = sc.nextInt()-1;
-            move = new Move(row, column, "X");
+            try{
+                Scanner sc = new Scanner(System.in);
+                System.out.print("Enter a valid move: row then column. e.g. 2 2\r\n>");
+                int row = sc.nextInt()-1;   //todo handle string inputs.
+                int column = sc.nextInt()-1;
+                move = new Move(row, column, "X");
+            } catch (InputMismatchException e){
+                System.out.println("Error - invalid entry.");
+            }
         }
         return move;
     }
