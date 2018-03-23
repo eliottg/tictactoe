@@ -29,7 +29,7 @@ class CLI {
             try{
                 Scanner sc = new Scanner(System.in);
                 printWelcome();
-                selection = sc.nextInt(); //todo handle string inputs.
+                selection = sc.nextInt();
             } catch (InputMismatchException e){
                 System.out.println("Error - enter a listed number.");
             }
@@ -70,7 +70,7 @@ class CLI {
             try{
                 Scanner sc = new Scanner(System.in);
                 System.out.print("Enter a valid move: row then column. e.g. 2 2\r\n>");
-                int row = sc.nextInt()-1;   //todo handle string inputs.
+                int row = sc.nextInt()-1;
                 int column = sc.nextInt()-1;
                 move = new Move(row, column, "X");
             } catch (InputMismatchException e){

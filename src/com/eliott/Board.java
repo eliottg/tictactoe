@@ -1,6 +1,7 @@
 package com.eliott;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by egray on 2/20/2018.
@@ -97,20 +98,21 @@ class Board {
         return true;
     }
 
-    Move searchBoardForWinningMove(String token) {
+    HashSet<Move> getWinningMovesSet(String token) {
+        HashSet<Move> moveSet = new HashSet<>();
         Move move;
         // check Rows and Columns
         for (int i = 0; i < 3; i++) {
             int[][] rowCoordinates = new int[][]{{i, 0}, {i, 1}, {i, 2}};
             move = findTwoInARow(token, rowCoordinates);
             if (move != null){
-                return move;
+                moveSet.add(move);
             }
 
             int[][] columnCoordinates = new int[][]{{0, i},{1, i},{2, i}};
             move = findTwoInARow(token, columnCoordinates);
             if (move != null){
-                return move;
+                moveSet.add(move);
             }
         }
 
@@ -118,18 +120,27 @@ class Board {
         int[][] forwardDiagonalCoords = new int[][]{{0, 0},{1, 1},{2, 2}};
         move = findTwoInARow(token, forwardDiagonalCoords);
         if(move != null){
-            return move;
+            moveSet.add(move);
         }
 
         int[][] backwardDiagonalCoords = new int[][]{{0, 2},{1, 1},{2, 0}};
         move = findTwoInARow(token, backwardDiagonalCoords);
         if(move != null){
-            return move;
+            moveSet.add(move);
         }
 
-        return null;
+        return moveSet;
     }
 
+    Move getWinningMove(String token){
+        Move winningMove = null;
+        HashSet<Move> moveSet = getWinningMovesSet(token);
+        if (moveSet.size() > 0){
+            winningMove = moveSet.iterator().next();
+        }
+
+        return winningMove;
+    }
 
     Move findTwoInARow(String token, int[][] rowColOrDiagonal){
         String boardCell;
@@ -157,4 +168,112 @@ class Board {
         }
         return null;
     }
+
+    Move findForkOpportunity(String token){
+        Move move = null;
+
+        ArrayList<int[]> availableMoves = getListOfAvailableMoves();
+        for (int i = 0; i < availableMoves.size(); i++){
+            int[] moveToCheck = availableMoves.get(i);
+            int row = moveToCheck[0];
+            int col = moveToCheck[1];
+
+            boardMatrix[row][col] = token;
+            HashSet<Move> winningMovesSet = getWinningMovesSet(token);
+            boardMatrix[row][col] = " ";
+
+            if (winningMovesSet.size() > 1) {
+                move = new Move(row, col, token);
+                break;
+            }
+        }
+        return move;
+    }
+
+    Move blockOpponentFork(String myToken, String opponentToken){   //todo unit test.
+        Move move = null;
+
+        ArrayList<int[]> availableMoves = getListOfAvailableMoves();
+        for (int i = 0; i < availableMoves.size(); i++){
+            int[] moveToCheck = availableMoves.get(i);
+            int row = moveToCheck[0];
+            int col = moveToCheck[1];
+
+            boardMatrix[row][col] = opponentToken;
+            HashSet<Move> opponentWinningMovesSet = getWinningMovesSet(opponentToken);
+            boardMatrix[row][col] = " ";
+
+            if (opponentWinningMovesSet.size() > 1) {
+
+                // departure from the "find my own fork" method - look for my own winnings when blocking.
+                boardMatrix[row][col] = myToken;
+                HashSet<Move> myWinningMovesSet = getWinningMovesSet(myToken);
+                boardMatrix[row][col] = " ";
+
+                if (myWinningMovesSet.size() > 0) {
+                    move = new Move(row, col, myToken);
+                    break;
+                }
+            }
+        }
+        return move;
+    }
+
+    Move findCenterOpportunity(String token) {
+        Move move = null;
+
+        if (boardMatrix[1][1].equals(" ")) {
+            move = new Move(1, 1, token);
+        }
+
+        return move;
+    }
+
+    Move findCornerOpportunity(String myToken, String otherToken) {
+        Move cornerMove = null;
+
+        ArrayList<int[]> availableMoves = getListOfAvailableMoves();
+        for (int i = 0; i < availableMoves.size(); i++){
+            int[] moveToCheck = availableMoves.get(i);
+            int rowToCheck = moveToCheck[0];
+            int colToCheck = moveToCheck[1];
+
+            // check if move is a corner move  //todo break out into method?
+            if ((rowToCheck == 0 || rowToCheck == 2) && (colToCheck == 0 || colToCheck == 2)) {
+
+                cornerMove = new Move(rowToCheck, colToCheck, myToken);
+
+                // get opposite corner
+                int oppositeCornerRow = rowToCheck ^ 2;
+                int oppositeCornerColumn = colToCheck ^ 2;
+
+                String oppositeCornerToken = boardMatrix[oppositeCornerRow][oppositeCornerColumn];
+                // if opposite corner is enemy-controlled, return move.
+                if (oppositeCornerToken.equals(otherToken)) {
+                    return cornerMove;
+                }
+            }
+        }
+        return cornerMove;
+    }
+
+    Move findEdgeOpportunity(String token) {
+        Move edgeMove = null;
+
+        ArrayList<int[]> availableMoves = getListOfAvailableMoves();
+        for (int i = 0; i < availableMoves.size(); i++){
+            int[] moveToCheck = availableMoves.get(i);
+            int row = moveToCheck[0];
+            int col = moveToCheck[1];
+
+            // check if edge cell.
+            if((row == 0 && col == 1) || (row == 1 && col == 0) || (row == 1 && col == 2) || (row == 2 && col == 1)){
+                edgeMove = new Move(row, col, token);
+                break;
+            }
+        }
+
+        return edgeMove;
+    }
+
 }

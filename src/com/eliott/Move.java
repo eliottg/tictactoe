@@ -16,6 +16,7 @@ class Move {
         this.token = token;
     }
 
+    void setToken(String token) { this.token = token; }
     int getRow() { return this.row; }
     int getCol() { return this.col; }
     String getToken() { return this.token; }

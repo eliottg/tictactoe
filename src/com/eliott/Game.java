@@ -1,6 +1,7 @@
 package com.eliott;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -47,9 +48,9 @@ class Game {
     }
 
     Move getEasyMove() {
-        Move move = board.searchBoardForWinningMove(computerToken);
-        if (move != null){
-            return move;
+        HashSet<Move> moveSet = board.getWinningMovesSet(computerToken);
+        if (moveSet.size() > 0){
+            return moveSet.iterator().next();
         }
 
         return getRandomMove();
@@ -68,14 +69,15 @@ class Game {
     Move getHardMove() {
         Move move;
 
-        move = board.searchBoardForWinningMove(computerToken); // Find computer win.
-        if (move!= null) {
+        move = board.getWinningMove(computerToken);
+        if (move != null) {
             return move;
         }
 
-        move = board.searchBoardForWinningMove(playerToken); // Block player win.
+        move = board.getWinningMove(playerToken);
         if (move != null) {
-            return new Move(move.getRow(), move.getCol(), computerToken); //Todo have to hack this to reuse the winning move method, which auto-creates the same move as the input token.
+            move.setToken(computerToken);  //todo Avoid having to override auto-built move with new token OR make into method.
+            return move;
         }
 
         return getRandomMove();
@@ -84,21 +86,39 @@ class Game {
     Move getImpossibleMove() {
         Move move;
 
-        move = board.searchBoardForWinningMove(computerToken); // Find computer win.
-        if (move!= null) {
+        move = board.getWinningMove(computerToken);
+        if (move != null) {
             return move;
         }
 
-        move = board.searchBoardForWinningMove(playerToken); // Block player win.
+        move = board.getWinningMove(playerToken);
         if (move != null) {
-            return new Move(move.getRow(), move.getCol(), computerToken); //Todo have to hack this to reuse the winning move method, which auto-creates the same move as the input token.
+            move.setToken(computerToken);  //todo Avoid having to override auto-built move with new token OR make into method.
+            return move;
         }
 
-        //todo: Implement check for possible forks
-        //todo: Check for blocking forks
-        //todo: Check for priority of remaining moves: Center, opposite corner, empty corner, empty side
+        move = board.findForkOpportunity(computerToken);
+        if (move != null) {
+            return move;
+        }
 
-        return getRandomMove(); //todo: Deprecate.
+        move = board.blockOpponentFork(computerToken, playerToken);
+        if (move != null) {
+            return move;
+        }
+
+        move = board.findCenterOpportunity(computerToken);
+        if (move != null) {
+            return move;
+        }
+
+        move = board.findCornerOpportunity(computerToken, playerToken);
+        if (move != null){
+            return move;
+        }
+
+        return board.findEdgeOpportunity(computerToken);
+
     }
 
 
