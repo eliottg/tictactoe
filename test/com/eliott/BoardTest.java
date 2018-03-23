@@ -47,21 +47,50 @@ public class BoardTest{
     }
 
     @Test
-    public void testGetListOfAvailableMoves_almostFullBoard(){
+    public void testRemoveMoveFromAvailableMoveList_success() {
+        Move move = new Move(0, 0, "X");
+        assertEquals(9, board.getAvailableMovesList().size());
+        board.removeMoveFromAvailableMoveList(move);
+        assertEquals(8, board.getAvailableMovesList().size());
+    }
+
+    @Test
+    public void testRemoveMoveFromAvailableMoveList_duplicateRemovalsChangeNothing() {
+        Move move = new Move(0, 0, "X");
+        assertEquals(9, board.getAvailableMovesList().size());
+        board.removeMoveFromAvailableMoveList(move);
+        board.removeMoveFromAvailableMoveList(move);
+        assertEquals(8, board.getAvailableMovesList().size());
+    }
+
+    @Test
+    public void testGetAvailableMovesList_emptyBoard() {
+        assertEquals(9, board.getAvailableMovesList().size());
+    }
+
+    @Test
+    public void testGetAvailableMovesList_oneMoveMade() {
+        Move move = new Move(0, 0, "X");
+        board.addMove(move);
+        assertEquals(8, board.getAvailableMovesList().size());
+    }
+
+    @Test
+    public void testGenerateListOfAvailableMoves_almostFullBoard(){
         board.setBoardMatrix(new String[][]{
                 {"X", " ", "X"},
                 {"X", "X", "X"},
                 {"X", "X", "X"}});
-        assertEquals(1, board.getListOfAvailableMoves().size());
+        assertEquals(1, board.getAvailableMovesList().size());
     }
 
     @Test
-    public void testGetListOfAvailableMoves_emptyBoard(){
+    public void testGenerateListOfAvailableMoves_emptyBoard(){
         board.setBoardMatrix(new String[][]{
                 {" ", " ", " "},
                 {" ", " ", " "},
                 {" ", " ", " "}});
-        assertEquals(9, board.getListOfAvailableMoves().size());
+        assertEquals(9, board.getAvailableMovesList().size());
     }
 
     @Test

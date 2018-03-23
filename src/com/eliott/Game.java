@@ -57,13 +57,13 @@ class Game {
     }
 
     Move getRandomMove() {
-        ArrayList<int[]> availableMoves = board.getListOfAvailableMoves();
+        ArrayList<Move> availableMoves = board.getAvailableMovesList();
+
         int availableMoveCount = availableMoves.size();
         int randomMoveId = ThreadLocalRandom.current().nextInt(0, availableMoveCount);
-        int row = availableMoves.get(randomMoveId)[0];
-        int col = availableMoves.get(randomMoveId)[1];
-
-        return new Move(row, col, computerToken);
+        Move randomMove = availableMoves.get(randomMoveId);
+        randomMove.setToken(computerToken);
+        return randomMove;
     }
 
     Move getHardMove() {

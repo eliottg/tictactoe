@@ -34,7 +34,7 @@ public class GameTest {
     @Test
     public void testMakeComputerMove_easy() {
         game.makeComputerMove();
-        int movesRemainingCount = game.board.getListOfAvailableMoves().size();
+        int movesRemainingCount = game.board.getAvailableMovesList().size();
         assertEquals(8, movesRemainingCount);
     }
 
@@ -42,7 +42,7 @@ public class GameTest {
     public void testMakeComputerMove_hard() {
         game = new Game(1, "X", "O");
         game.makeComputerMove();
-        int movesRemainingCount = game.board.getListOfAvailableMoves().size();
+        int movesRemainingCount = game.board.getAvailableMovesList().size();
         assertEquals(8, movesRemainingCount);
     }
 

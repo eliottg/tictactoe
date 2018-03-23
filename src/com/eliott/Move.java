@@ -13,7 +13,7 @@ class Move {
     Move(int row, int col, String token) {
         this.row = row;
         this.col = col;
-        this.token = token;
+        this.token = token; //todo Remove pre-set token.
     }
 
     void setToken(String token) { this.token = token; }
