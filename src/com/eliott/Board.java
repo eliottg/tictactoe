@@ -8,50 +8,48 @@ import java.util.HashSet;
  */
 class Board {
 
-    private String[][] boardMatrix;
+    private Move[][] boardMatrix;
     private ArrayList<Move> availableMovesList;
 
     Board() {
-        boardMatrix = new String[3][3];
+        boardMatrix = new Move[3][3];
         availableMovesList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                boardMatrix[i][j] = " ";
-//                availableMovesList.add(new int[]{i, j});  //todo Remove
-                availableMovesList.add(new Move(i, j, ""));
+                Move newMove = new Move(i, j, " ");
+                boardMatrix[i][j] = newMove;
+                availableMovesList.add(newMove);
 
             }
         }
     }
 
 
-    String[][] getBoardMatrix() { return boardMatrix; }
+    Move[][] getBoardMatrix() { return boardMatrix; }
 
     ArrayList<Move> getAvailableMovesList() { return availableMovesList; }
 
     void setBoardMatrix(String[][] newBoardMatrix) {
-        boardMatrix = newBoardMatrix;
         availableMovesList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if(boardMatrix[i][j].equals(" ")){
-//                    availableMovesList.add(new int[]{i, j});  //todo Remove
-                    availableMovesList.add(new Move(i, j, ""));
+                String newToken = newBoardMatrix[i][j];
+                Move newMove = new Move(i, j, newToken);
+                boardMatrix[i][j] = newMove;
+                if(newToken.equals(" ")){
+                    availableMovesList.add(newMove);
                 }
             }
         }
     }
 
     void addMove(Move move) {
-        int row = move.getRow();
-        int col = move.getCol();
-        String token = move.getToken();
-        boardMatrix[row][col] = token;
+        boardMatrix[move.getRow()][move.getCol()] = move;
         removeMoveFromAvailableMoveList(move);
     }
 
     void removeMoveFromAvailableMoveList(Move moveToRemove) {
-        Move move = null;
+        Move move = null;   //todo Ensure that incoming moves is the same reference, so this is unnecessary?
         for ( Move availableMove : availableMovesList) {
             if (availableMove.getRow() == moveToRemove.getRow() && availableMove.getCol() == moveToRemove.getCol()){
                 move = availableMove;
@@ -73,23 +71,23 @@ class Board {
 
     boolean isVictory() {
         for (int i = 0; i < 3; i++) {
-            String[] row = new String[]{boardMatrix[i][0], boardMatrix[i][1], boardMatrix[i][2]};
+            Move[] row = new Move[]{boardMatrix[i][0], boardMatrix[i][1], boardMatrix[i][2]};
             if (checkRowForVictory(row)){
                 return true;
             }
 
-            String[] column = new String[]{boardMatrix[0][i], boardMatrix[1][i], boardMatrix[2][i]};
+            Move[] column = new Move[]{boardMatrix[0][i], boardMatrix[1][i], boardMatrix[2][i]};
             if (checkRowForVictory(column)){
                 return true;
             }
         }
 
-        String[] frontDiagonal = new String[]{boardMatrix[0][0], boardMatrix[1][1], boardMatrix[2][2]};
+        Move[] frontDiagonal = new Move[]{boardMatrix[0][0], boardMatrix[1][1], boardMatrix[2][2]};
         if (checkRowForVictory(frontDiagonal)){
             return true;
         }
 
-        String[] backDiagonal = new String[]{boardMatrix[0][2], boardMatrix[1][1], boardMatrix[2][0]};
+        Move[] backDiagonal = new Move[]{boardMatrix[0][2], boardMatrix[1][1], boardMatrix[2][0]};
         if (checkRowForVictory(backDiagonal)){
             return true;
         }
@@ -97,21 +95,16 @@ class Board {
         return false;
     }
 
-    boolean checkRowForVictory(String[] row) {
-        boolean rowIsIdentical = row[0].equals(row[1]) && row[1].equals(row[2]);
-        boolean rowIsNotEmpty = !row[0].equals(" ");
+    boolean checkRowForVictory(Move[] row) {
+        String cellOneToken = row[0].getToken();
+        String cellTwoToken = row[1].getToken();
+        String cellThreeToken = row[2].getToken();
+        boolean rowIsIdentical = cellOneToken.equals(cellTwoToken) && cellTwoToken.equals(cellThreeToken);
+        boolean rowIsNotEmpty = !cellOneToken.equals(" ");
         return rowIsIdentical && rowIsNotEmpty;
     }
 
     boolean boardIsFull() {
-//        for (int i = 0; i < 3; i++) {
-//            for (int j = 0; j < 3; j++) {
-//                if (boardMatrix[i][j].equals(" ")){
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
         return availableMovesList.size() == 0;
     }
 
@@ -160,7 +153,7 @@ class Board {
     }
 
     Move findTwoInARow(String token, int[][] rowColOrDiagonal){
-        String boardCell;
+        Move boardCell;
         int boardRowCoordinate;
         int boardColumnCoordinate;
         int tokenCounter = 0;
@@ -172,16 +165,16 @@ class Board {
             boardRowCoordinate = rowColOrDiagonal[i][0];
             boardColumnCoordinate = rowColOrDiagonal[i][1];
             boardCell = boardMatrix[boardRowCoordinate][boardColumnCoordinate];
-            if (boardCell.equals(token)){
+            if (boardCell.getToken().equals(token)){
                 tokenCounter++;
-            } else if (boardCell.equals(" ")){
+            } else if (boardCell.getToken().equals(" ")){
                 emptyCounter++;
                 emptyIndex = i;
             }
         }
         if (tokenCounter == 2 && emptyCounter == 1){
             winningCoordinates = rowColOrDiagonal[emptyIndex];
-            return new Move(winningCoordinates[0], winningCoordinates[1], token);
+            return new Move(winningCoordinates[0], winningCoordinates[1], token);  //todo reuse existing move
         }
         return null;
     }
@@ -192,12 +185,12 @@ class Board {
         for (Move moveToCheck : availableMovesList){
             int row = moveToCheck.getRow();
             int col = moveToCheck.getCol();
-            boardMatrix[row][col] = token;
+            boardMatrix[row][col].setToken(token);
             HashSet<Move> winningMovesSet = getWinningMovesSet(token);
-            boardMatrix[row][col] = " ";
+            boardMatrix[row][col].setToken(" ");
 
             if (winningMovesSet.size() > 1) {
-                move = new Move(row, col, token);
+                move = new Move(row, col, token);  //todo reuse existing move
                 break;
             }
         }
@@ -211,19 +204,19 @@ class Board {
             int row = moveToCheck.getRow();
             int col = moveToCheck.getCol();
 
-            boardMatrix[row][col] = opponentToken;
+            boardMatrix[row][col].setToken(opponentToken);
             HashSet<Move> opponentWinningMovesSet = getWinningMovesSet(opponentToken);
-            boardMatrix[row][col] = " ";
+            boardMatrix[row][col].setToken(" ");
 
             if (opponentWinningMovesSet.size() > 1) {
 
                 // departure from the "find my own fork" method - look for my own winnings when blocking.
-                boardMatrix[row][col] = myToken;
+                boardMatrix[row][col].setToken(myToken);
                 HashSet<Move> myWinningMovesSet = getWinningMovesSet(myToken);
-                boardMatrix[row][col] = " ";
+                boardMatrix[row][col].setToken(" ");
 
                 if (myWinningMovesSet.size() > 0) {
-                    move = new Move(row, col, myToken);
+                    move = new Move(row, col, myToken); //todo reuse existing move
                     break;
                 }
             }
@@ -234,8 +227,8 @@ class Board {
     Move findCenterOpportunity(String token) {
         Move move = null;
 
-        if (boardMatrix[1][1].equals(" ")) {
-            move = new Move(1, 1, token);
+        if (boardMatrix[1][1].getToken().equals(" ")) {
+            move = new Move(1, 1, token);  //todo reuse existing move
         }
 
         return move;
@@ -251,13 +244,13 @@ class Board {
             // check if move is a corner move  //todo break out into method?
             if ((row == 0 || row == 2) && (col == 0 || col == 2)) {
 
-                cornerMove = new Move(row, col, myToken);
+                cornerMove = new Move(row, col, myToken);   //todo reuse existing move...
 
                 // get opposite corner
                 int oppositeCornerRow = row ^ 2;
                 int oppositeCornerColumn = col ^ 2;
 
-                String oppositeCornerToken = boardMatrix[oppositeCornerRow][oppositeCornerColumn];
+                String oppositeCornerToken = boardMatrix[oppositeCornerRow][oppositeCornerColumn].getToken();
                 // if opposite corner is enemy-controlled, return move.
                 if (oppositeCornerToken.equals(otherToken)) {
                     return cornerMove;
@@ -276,7 +269,7 @@ class Board {
 
             // check if edge cell.
             if((row == 0 && col == 1) || (row == 1 && col == 0) || (row == 1 && col == 2) || (row == 2 && col == 1)){
-                edgeMove = new Move(row, col, token);
+                edgeMove = new Move(row, col, token);  //todo reuse existing move.
                 break;
             }
         }

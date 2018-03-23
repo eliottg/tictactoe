@@ -48,18 +48,18 @@ class CLI {
     }
 
     private void printBoard(){
-        String[][] boardMatrix = game.board.getBoardMatrix();
+        Move[][] boardMatrix = game.board.getBoardMatrix();
         String header = "    1   2   3";
         String highLowSep = "   -----------";
         String row = "%d | %s | %s | %s |";
         String rowSep = "  |---+---+---|";
         System.out.println(header);
         System.out.println(highLowSep);
-        System.out.println(String.format(row, 1, boardMatrix[0][0], boardMatrix[0][1], boardMatrix[0][2]));
+        System.out.println(String.format(row, 1, boardMatrix[0][0].getToken(), boardMatrix[0][1].getToken(), boardMatrix[0][2].getToken()));
         System.out.println(rowSep);
-        System.out.println(String.format(row, 2, boardMatrix[1][0], boardMatrix[1][1], boardMatrix[1][2]));
+        System.out.println(String.format(row, 2, boardMatrix[1][0].getToken(), boardMatrix[1][1].getToken(), boardMatrix[1][2].getToken()));
         System.out.println(rowSep);
-        System.out.println(String.format(row, 3, boardMatrix[2][0], boardMatrix[2][1], boardMatrix[2][2]));
+        System.out.println(String.format(row, 3, boardMatrix[2][0].getToken(), boardMatrix[2][1].getToken(), boardMatrix[2][2].getToken()));
         System.out.println(highLowSep);
         System.out.println();
     }

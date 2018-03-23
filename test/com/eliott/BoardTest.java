@@ -20,10 +20,10 @@ public class BoardTest{
     
     @Test
     public void testNewBoardCellsAreNull() {
-        String[][] boardMatrix = board.getBoardMatrix();
+        Move[][] boardMatrix = board.getBoardMatrix();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                assertEquals(" ", boardMatrix[i][j]);
+                assertEquals(" ", boardMatrix[i][j].getToken());
             }
         }
     }
@@ -34,16 +34,16 @@ public class BoardTest{
                 {"X", "O", "X"},
                 {"O", "X", "O"},
                 {"X", "O", "X"}});
-        assertEquals("X", board.getBoardMatrix()[0][0]);
-        assertEquals("O", board.getBoardMatrix()[1][0]);
-        assertEquals("X", board.getBoardMatrix()[2][0]);
+        assertEquals("X", board.getBoardMatrix()[0][0].getToken());
+        assertEquals("O", board.getBoardMatrix()[1][0].getToken());
+        assertEquals("X", board.getBoardMatrix()[2][0].getToken());
     }
 
     @Test
     public void testAddMove_MoveSuccess() {
         Move move = new Move(0, 0, "X");
         board.addMove(move);
-        assertEquals(board.getBoardMatrix()[0][0], "X");
+        assertEquals(board.getBoardMatrix()[0][0].getToken(), "X");
     }
 
     @Test
@@ -185,13 +185,19 @@ public class BoardTest{
 
     @Test
     public void testCheckRowForVictory_true(){
-        String[] row = new String[]{"X", "X", "X"};
+        Move[] row = new Move[]{
+                new Move(0, 0, "X"),
+                new Move(0, 1, "X"),
+                new Move(0, 2, "X")};
         assertTrue(board.checkRowForVictory(row));
     }
 
     @Test
     public void testCheckRowForVictory_false(){
-        String[] row = new String[]{"X", "O", "X"};
+        Move[] row = new Move[]{
+                new Move(0, 0, "X"),
+                new Move(0, 1, "O"),
+                new Move(0, 2, " ")};
         assertFalse(board.checkRowForVictory(row));
     }
 

@@ -49,12 +49,8 @@ public class GameTest {
     @Test
     public void testMakeManualMove_valid() {
         game.makeManualMove(new Move(0, 0, "X"));
-        String[][] expectedBoardMatrix = new String[][]{
-                {"X", " ", " "},
-                {" ", " ", " "},
-                {" ", " ", " "}};
-        assertArrayEquals(expectedBoardMatrix,
-                game.board.getBoardMatrix());
+        assertEquals(8, game.board.getAvailableMovesList().size());
+        assertEquals("X", game.board.getBoardMatrix()[0][0].getToken());
     }
 
     @Test(expected = IllegalStateException.class)

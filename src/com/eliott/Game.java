@@ -24,7 +24,7 @@ class Game {
     boolean moveIsValid(Move move) {
         int row = move.getRow();
         int col = move.getCol();
-        return row < 3 && row >= 0 && col < 3 && col >= 0 && board.getBoardMatrix()[row][col].equals(" ");
+        return row < 3 && row >= 0 && col < 3 && col >= 0 && board.getBoardMatrix()[row][col].getToken().equals(" ");
     }
 
     void makeComputerMove() {
