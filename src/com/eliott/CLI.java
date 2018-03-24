@@ -64,24 +64,23 @@ class CLI {
         System.out.println();
     }
 
-    private Move getMoveFromPlayer(){
-        Move move = new Move(-1, -1, "X");  //todo Remove this invalid move creation hack.
-        while(!game.moveIsValid(move)){
+    private void getMoveFromPlayer(){
+
+        boolean moveSuccess = false;
+        while(!moveSuccess){
             try{
                 Scanner sc = new Scanner(System.in);
                 System.out.print("Enter a valid move: row then column. e.g. 2 2\r\n>");
                 int row = sc.nextInt()-1;
-                int column = sc.nextInt()-1;
-                move = new Move(row, column, "X");
+                int col = sc.nextInt()-1;
+                moveSuccess = game.makeManualMove(row, col);
             } catch (InputMismatchException e){
                 System.out.println("Error - invalid entry.");
             }
         }
-        return move;
     }
 
     private void playGame(int difficulty){
-        //Board board = new Board();
         game = new Game(difficulty, "X", "O");
         boolean playerTurn = true;
         if(Math.random() < 0.5){
@@ -94,8 +93,7 @@ class CLI {
         while(game.board.getGameState().equals("Ongoing")){
             if(playerTurn){
                 printBoard();
-                Move move = getMoveFromPlayer();
-                game.makeManualMove(move);
+                getMoveFromPlayer();
             } else {
                 printBoard();
                 System.out.println("Computer turn...\n");

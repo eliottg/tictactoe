@@ -2,6 +2,7 @@ package com.eliott;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by egray on 2/20/2018.
@@ -43,19 +44,11 @@ class Board {
         }
     }
 
-    void addMove(Move move) {
-        boardMatrix[move.getRow()][move.getCol()] = move;
-        removeMoveFromAvailableMoveList(move);
-    }
-
-    void removeMoveFromAvailableMoveList(Move moveToRemove) {
-        Move move = null;   //todo Ensure that incoming moves is the same reference, so this is unnecessary?
-        for ( Move availableMove : availableMovesList) {
-            if (availableMove.getRow() == moveToRemove.getRow() && availableMove.getCol() == moveToRemove.getCol()){
-                move = availableMove;
-                break;
-            }
+    void makeMove(Move move, String token) {
+        if(!move.getToken().equals(" ")){
+            throw new IllegalStateException("Invalid move made. Validity should be checked earlier.");
         }
+        move.setToken(token);
         availableMovesList.remove(move);
     }
 
@@ -70,7 +63,7 @@ class Board {
     }
 
     boolean isVictory() {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) { //todo prepopulate these with move objects
             Move[] row = new Move[]{boardMatrix[i][0], boardMatrix[i][1], boardMatrix[i][2]};
             if (checkRowForVictory(row)){
                 return true;
@@ -112,29 +105,29 @@ class Board {
         HashSet<Move> moveSet = new HashSet<>();
         Move move;
         // check Rows and Columns
-        for (int i = 0; i < 3; i++) {
-            int[][] rowCoordinates = new int[][]{{i, 0}, {i, 1}, {i, 2}};
-            move = findTwoInARow(token, rowCoordinates);
+        for (int i = 0; i < 3; i++) {  //todo prepopulate these with move objects
+            Move[] rowMoves = new Move[]{boardMatrix[i][0], boardMatrix[i][1], boardMatrix[i][2]};
+            move = findTwoInARow(token, rowMoves);
             if (move != null){
                 moveSet.add(move);
             }
 
-            int[][] columnCoordinates = new int[][]{{0, i},{1, i},{2, i}};
-            move = findTwoInARow(token, columnCoordinates);
+            Move[] columnMoves = new Move[]{boardMatrix[0][i], boardMatrix[1][i], boardMatrix[2][i]};
+            move = findTwoInARow(token, columnMoves);
             if (move != null){
                 moveSet.add(move);
             }
         }
 
         // check Diagonals
-        int[][] forwardDiagonalCoords = new int[][]{{0, 0},{1, 1},{2, 2}};
-        move = findTwoInARow(token, forwardDiagonalCoords);
+        Move[] forwardDiagonalMoves = new Move[]{boardMatrix[0][0], boardMatrix[1][1], boardMatrix[2][2]};
+        move = findTwoInARow(token, forwardDiagonalMoves);
         if(move != null){
             moveSet.add(move);
         }
 
-        int[][] backwardDiagonalCoords = new int[][]{{0, 2},{1, 1},{2, 0}};
-        move = findTwoInARow(token, backwardDiagonalCoords);
+        Move[] backwardDiagonalMoves = new Move[]{boardMatrix[0][2], boardMatrix[1][1], boardMatrix[2][0]};
+        move = findTwoInARow(token, backwardDiagonalMoves);
         if(move != null){
             moveSet.add(move);
         }
@@ -142,139 +135,149 @@ class Board {
         return moveSet;
     }
 
-    Move getWinningMove(String token){
-        Move winningMove = null;
+    boolean makeWinningMove(String token){
         HashSet<Move> moveSet = getWinningMovesSet(token);
         if (moveSet.size() > 0){
-            winningMove = moveSet.iterator().next();
+            Move winningMove = moveSet.iterator().next();
+            makeMove(winningMove, token);
+            return true;
         }
-
-        return winningMove;
+        return false;
     }
 
-    Move findTwoInARow(String token, int[][] rowColOrDiagonal){
-        Move boardCell;
-        int boardRowCoordinate;
-        int boardColumnCoordinate;
+    void makeRandomMove(String token) {
+        ArrayList<Move> availableMoves = getAvailableMovesList();
+        int availableMoveCount = availableMoves.size();
+        int randomMoveId = ThreadLocalRandom.current().nextInt(0, availableMoveCount);
+        Move randomMove = availableMoves.get(randomMoveId);
+        makeMove(randomMove, token);
+    }
+
+    boolean blockWinningMove(String myToken, String opponentToken){  //todo unitTest
+        HashSet<Move> moveSet = getWinningMovesSet(opponentToken);
+        if (moveSet.size() > 0){
+            Move winningMove = moveSet.iterator().next();
+            makeMove(winningMove, myToken);
+            return true;
+        }
+        return false;
+    }
+
+    Move findTwoInARow(String token, Move[] rowColOrDiagonal){
         int tokenCounter = 0;
         int emptyCounter = 0;
         int emptyIndex = 0;
-        int[] winningCoordinates;
 
         for (int i = 0; i < 3; i++){
-            boardRowCoordinate = rowColOrDiagonal[i][0];
-            boardColumnCoordinate = rowColOrDiagonal[i][1];
-            boardCell = boardMatrix[boardRowCoordinate][boardColumnCoordinate];
-            if (boardCell.getToken().equals(token)){
+            Move moveToCheck = rowColOrDiagonal[i];
+            if (moveToCheck.getToken().equals(token)){
                 tokenCounter++;
-            } else if (boardCell.getToken().equals(" ")){
+            } else if (moveToCheck.getToken().equals(" ")){
                 emptyCounter++;
                 emptyIndex = i;
             }
         }
         if (tokenCounter == 2 && emptyCounter == 1){
-            winningCoordinates = rowColOrDiagonal[emptyIndex];
-            return new Move(winningCoordinates[0], winningCoordinates[1], token);  //todo reuse existing move
+            return rowColOrDiagonal[emptyIndex];
         }
         return null;
     }
 
-    Move findForkOpportunity(String token){
-        Move move = null;
-
+    boolean findForkOpportunity(String token){
         for (Move moveToCheck : availableMovesList){
-            int row = moveToCheck.getRow();
-            int col = moveToCheck.getCol();
-            boardMatrix[row][col].setToken(token);
+            moveToCheck.setToken(token);
             HashSet<Move> winningMovesSet = getWinningMovesSet(token);
-            boardMatrix[row][col].setToken(" ");
+            moveToCheck.setToken(" ");
 
             if (winningMovesSet.size() > 1) {
-                move = new Move(row, col, token);  //todo reuse existing move
-                break;
+                makeMove(moveToCheck, token);
+                return true;
             }
         }
-        return move;
+        return false;
     }
 
-    Move blockOpponentFork(String myToken, String opponentToken){   //todo unit test.
-        Move move = null;
+    boolean blockOpponentFork(String myToken, String opponentToken){
+        Move bestBlock = null;
+        int currentWinOpportunities = 0;
 
         for (Move moveToCheck : availableMovesList){
-            int row = moveToCheck.getRow();
-            int col = moveToCheck.getCol();
-
-            boardMatrix[row][col].setToken(opponentToken);
+            moveToCheck.setToken(opponentToken);
             HashSet<Move> opponentWinningMovesSet = getWinningMovesSet(opponentToken);
-            boardMatrix[row][col].setToken(" ");
+            moveToCheck.setToken(" ");
 
             if (opponentWinningMovesSet.size() > 1) {
 
                 // departure from the "find my own fork" method - look for my own winnings when blocking.
-                boardMatrix[row][col].setToken(myToken);
+                moveToCheck.setToken(myToken);
                 HashSet<Move> myWinningMovesSet = getWinningMovesSet(myToken);
-                boardMatrix[row][col].setToken(" ");
+                moveToCheck.setToken(" ");
 
-                if (myWinningMovesSet.size() > 0) {
-                    move = new Move(row, col, myToken); //todo reuse existing move
-                    break;
+                if (myWinningMovesSet.size() >= currentWinOpportunities) {
+                    bestBlock = moveToCheck;
+                    currentWinOpportunities = myWinningMovesSet.size();
                 }
             }
         }
-        return move;
-    }
-
-    Move findCenterOpportunity(String token) {
-        Move move = null;
-
-        if (boardMatrix[1][1].getToken().equals(" ")) {
-            move = new Move(1, 1, token);  //todo reuse existing move
+        if (bestBlock != null){
+            makeMove(bestBlock, myToken);
+            return true;
         }
-
-        return move;
+        return false;
     }
 
-    Move findCornerOpportunity(String myToken, String otherToken) {
-        Move cornerMove = null;
+    boolean findCenterOpportunity(String token) {
+        Move centerMove = boardMatrix[1][1];
+        if (centerMove.getToken().equals(" ")) {
+            makeMove(centerMove, token);
+            return true;
+        }
+        return false;
+    }
+
+    boolean findCornerOpportunity(String myToken, String otherToken) {
+        Move validCorner = null;
 
         for (Move moveToCheck : availableMovesList){
-            int row = moveToCheck.getRow();
-            int col = moveToCheck.getCol();
+            int rowToCheck = moveToCheck.getRow();
+            int colToCheck = moveToCheck.getCol();
 
             // check if move is a corner move  //todo break out into method?
-            if ((row == 0 || row == 2) && (col == 0 || col == 2)) {
+            if ((rowToCheck == 0 || rowToCheck == 2) && (colToCheck == 0 || colToCheck == 2)) {
 
-                cornerMove = new Move(row, col, myToken);   //todo reuse existing move...
+                validCorner = moveToCheck;
 
                 // get opposite corner
-                int oppositeCornerRow = row ^ 2;
-                int oppositeCornerColumn = col ^ 2;
+                int oppositeCornerRow = rowToCheck ^ 2;
+                int oppositeCornerColumn = colToCheck ^ 2;
 
-                String oppositeCornerToken = boardMatrix[oppositeCornerRow][oppositeCornerColumn].getToken();
+                Move oppositeCornerMove = boardMatrix[oppositeCornerRow][oppositeCornerColumn];
                 // if opposite corner is enemy-controlled, return move.
-                if (oppositeCornerToken.equals(otherToken)) {
-                    return cornerMove;
+                if (oppositeCornerMove.getToken().equals(otherToken)) {
+                    makeMove(moveToCheck, myToken);
+                    return true;
                 }
             }
         }
-        return cornerMove;
+        if (validCorner != null) {
+            makeMove(validCorner, myToken);
+            return true;
+        }
+        return false;
     }
 
-    Move findEdgeOpportunity(String token) {
-        Move edgeMove = null;
+    boolean findEdgeOpportunity(String token) {
 
         for (Move moveToCheck : availableMovesList){
             int row = moveToCheck.getRow();
             int col = moveToCheck.getCol();
 
-            // check if edge cell.
+            // check if edge cell. //todo break out into method?
             if((row == 0 && col == 1) || (row == 1 && col == 0) || (row == 1 && col == 2) || (row == 2 && col == 1)){
-                edgeMove = new Move(row, col, token);  //todo reuse existing move.
-                break;
+                makeMove(moveToCheck, token);
+                return true;
             }
         }
-
-        return edgeMove;
+        return false;
     }
-
 }

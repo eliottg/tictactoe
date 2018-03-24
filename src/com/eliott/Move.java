@@ -4,7 +4,7 @@ package com.eliott;
  * Created by egray on 2/21/2018.
  */
 
-class Move {
+class Move {    //todo rename to Cell, instead of Move.
 
     private int row;
     private int col;

@@ -1,9 +1,5 @@
 package com.eliott;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
  * Created by egray on 2/20/2018.
  */
@@ -21,105 +17,49 @@ class Game {
         this.computerToken = computerToken;
     }
 
-    boolean moveIsValid(Move move) {
-        int row = move.getRow();
-        int col = move.getCol();
+    boolean moveIsValid(int row, int col) {
         return row < 3 && row >= 0 && col < 3 && col >= 0 && board.getBoardMatrix()[row][col].getToken().equals(" ");
     }
 
     void makeComputerMove() {
-        Move move = new Move(-1, -1, computerToken);  //todo Remove this invalid move creation hack.
         if (difficultyValue == 1) {
-            move = getEasyMove();
+            makeEasyMove();
         } else if (difficultyValue == 2) {
-            move = getHardMove();
+            makeHardMove();
         } else if (difficultyValue == 3) {
-            move = getImpossibleMove();
+            makeImpossibleMove();
         }
-        board.addMove(move);
     }
 
-    void makeManualMove(Move move){
-        if (moveIsValid(move)){
-            board.addMove(move);
+    boolean makeManualMove(int row, int col){
+        if (moveIsValid(row, col)){
+            Move move = board.getBoardMatrix()[row][col];
+            board.makeMove(move, playerToken);
+            return true;
         } else {
-            throw new IllegalStateException("Invalid move made. Validity should be checked earlier.");
+            return false;
         }
     }
 
-    Move getEasyMove() {
-        HashSet<Move> moveSet = board.getWinningMovesSet(computerToken);
-        if (moveSet.size() > 0){
-            return moveSet.iterator().next();
-        }
-
-        return getRandomMove();
+    void makeEasyMove() {
+        if(board.makeWinningMove(computerToken)){ return; }
+        board.makeRandomMove(computerToken);
     }
 
-    Move getRandomMove() {
-        ArrayList<Move> availableMoves = board.getAvailableMovesList();
-
-        int availableMoveCount = availableMoves.size();
-        int randomMoveId = ThreadLocalRandom.current().nextInt(0, availableMoveCount);
-        Move randomMove = availableMoves.get(randomMoveId);
-        randomMove.setToken(computerToken);
-        return randomMove;
+    void makeHardMove() {
+        if(board.makeWinningMove(computerToken)){ return; }
+        if(board.blockWinningMove(computerToken, playerToken)){ return; }
+        board.makeRandomMove(computerToken);
     }
 
-    Move getHardMove() {
-        Move move;
-
-        move = board.getWinningMove(computerToken);
-        if (move != null) {
-            return move;
-        }
-
-        move = board.getWinningMove(playerToken);
-        if (move != null) {
-            move.setToken(computerToken);  //todo Avoid having to override auto-built move with new token OR make into method.
-            return move;
-        }
-
-        return getRandomMove();
+    void makeImpossibleMove() {
+        if(board.makeWinningMove(computerToken)){ return; }
+        if(board.blockWinningMove(computerToken, playerToken)){ return; }
+        if(board.findForkOpportunity(computerToken)){ return; }
+        if(board.blockOpponentFork(computerToken, playerToken)){ return; }
+        if(board.findCenterOpportunity(computerToken)){ return; }
+        if(board.findCornerOpportunity(computerToken, playerToken)){ return; }
+        board.findEdgeOpportunity(computerToken);
     }
-
-    Move getImpossibleMove() {
-        Move move;
-
-        move = board.getWinningMove(computerToken);
-        if (move != null) {
-            return move;
-        }
-
-        move = board.getWinningMove(playerToken);
-        if (move != null) {
-            move.setToken(computerToken);  //todo Avoid having to override auto-built move with new token OR make into method.
-            return move;
-        }
-
-        move = board.findForkOpportunity(computerToken);
-        if (move != null) {
-            return move;
-        }
-
-        move = board.blockOpponentFork(computerToken, playerToken);
-        if (move != null) {
-            return move;
-        }
-
-        move = board.findCenterOpportunity(computerToken);
-        if (move != null) {
-            return move;
-        }
-
-        move = board.findCornerOpportunity(computerToken, playerToken);
-        if (move != null){
-            return move;
-        }
-
-        return board.findEdgeOpportunity(computerToken);
-
-    }
-
 
 }

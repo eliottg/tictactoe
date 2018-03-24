@@ -40,27 +40,19 @@ public class BoardTest{
     }
 
     @Test
-    public void testAddMove_MoveSuccess() {
-        Move move = new Move(0, 0, "X");
-        board.addMove(move);
-        assertEquals(board.getBoardMatrix()[0][0].getToken(), "X");
+    public void testMakeMove_MoveSuccess() {
+        Move move = board.getBoardMatrix()[1][1];
+        assertEquals(9, board.getAvailableMovesList().size());
+        board.makeMove(move, "X");
+        assertEquals(8, board.getAvailableMovesList().size());
+        assertEquals(board.getBoardMatrix()[1][1].getToken(), "X");
     }
 
-    @Test
-    public void testRemoveMoveFromAvailableMoveList_success() {
-        Move move = new Move(0, 0, "X");
-        assertEquals(9, board.getAvailableMovesList().size());
-        board.removeMoveFromAvailableMoveList(move);
-        assertEquals(8, board.getAvailableMovesList().size());
-    }
-
-    @Test
-    public void testRemoveMoveFromAvailableMoveList_duplicateRemovalsChangeNothing() {
-        Move move = new Move(0, 0, "X");
-        assertEquals(9, board.getAvailableMovesList().size());
-        board.removeMoveFromAvailableMoveList(move);
-        board.removeMoveFromAvailableMoveList(move);
-        assertEquals(8, board.getAvailableMovesList().size());
+    @Test (expected = IllegalStateException.class)
+    public void testMakeMove_Failure(){
+        Move move = board.getBoardMatrix()[1][1];
+        board.makeMove(move, "X");
+        board.makeMove(move, "X");
     }
 
     @Test
@@ -70,8 +62,8 @@ public class BoardTest{
 
     @Test
     public void testGetAvailableMovesList_oneMoveMade() {
-        Move move = new Move(0, 0, "X");
-        board.addMove(move);
+        Move move = board.getBoardMatrix()[0][0];
+        board.makeMove(move, "X");
         assertEquals(8, board.getAvailableMovesList().size());
     }
 
@@ -250,61 +242,88 @@ public class BoardTest{
     }
 
     @Test
-    public void testGetWinningMove_withPossibleRowWin(){
+    public void testMakeWinningMove_withPossibleRowWin(){
         board.setBoardMatrix(new String[][]{
                 {"X", "X", " "},
                 {" ", " ", " "},
                 {" ", " ", " "}});
-        Move winningMove = board.getWinningMove("X");
+        board.makeWinningMove("X");
+        Move winningMove = board.getBoardMatrix()[0][2];
         assertEquals(0, winningMove.getRow());
         assertEquals(2, winningMove.getCol());
         assertEquals("X", winningMove.getToken());
     }
 
     @Test
-    public void testGetWinningMove_withPossibleColumnWin(){
+    public void testMakeWinningMove_withPossibleColumnWin(){
         board.setBoardMatrix(new String[][]{
                 {"X", " ", " "},
                 {"X", " ", " "},
                 {" ", " ", " "}});
-        Move winningMove = board.getWinningMove("X");
+        board.makeWinningMove("X");
+        Move winningMove = board.getBoardMatrix()[2][0];
         assertEquals(2, winningMove.getRow());
         assertEquals(0, winningMove.getCol());
         assertEquals("X", winningMove.getToken());
     }
 
     @Test
-    public void testGetWinningMove_withPossibleForwardDiagonalWin(){
+    public void testMakeWinningMove_withPossibleForwardDiagonalWin(){
         board.setBoardMatrix(new String[][]{
                 {"X", " ", " "},
                 {" ", "X", " "},
                 {" ", "", " "}});
-        Move winningMove = board.getWinningMove("X");
+        board.makeWinningMove("X");
+        Move winningMove = board.getBoardMatrix()[2][2];
         assertEquals(2, winningMove.getRow());
         assertEquals(2, winningMove.getCol());
         assertEquals("X", winningMove.getToken());
     }
 
     @Test
-    public void testGetWinningMove_withPossibleBackwardDiagonalWin(){
+    public void testMakeWinningMove_withPossibleBackwardDiagonalWin(){
         board.setBoardMatrix(new String[][]{
                 {" ", " ", "X"},
                 {" ", " ", " "},
                 {"X", " ", " "}});
-        Move winningMove = board.getWinningMove("X");
+        board.makeWinningMove("X");
+        Move winningMove = board.getBoardMatrix()[1][1];
         assertEquals(1, winningMove.getRow());
         assertEquals(1, winningMove.getCol());
         assertEquals("X", winningMove.getToken());
     }
 
     @Test
-    public void testGetWinningMove_failure(){
+    public void testMakeWinningMove_failure(){
         board.setBoardMatrix(new String[][]{
                 {" ", " ", "O"},
                 {" ", " ", ""},
                 {"O", " ", " "}});
-        Move winningMove = board.getWinningMove("X");
-        assertNull(winningMove);
+        board.makeWinningMove("X");
+        Move notWinningMove = board.getBoardMatrix()[1][1];
+        assertEquals(" ", notWinningMove.getToken());
+    }
+
+    @Test
+    public void testMakeRandomMove_lastAvailableMove() {
+        board.setBoardMatrix(new String[][]{
+                {"X", " ", "X"},
+                {"X", "X", "X"},
+                {"X", "X", "X"}});
+        board.makeRandomMove("O");
+        Move move = board.getBoardMatrix()[0][1];
+        assertEquals("O", move.getToken());
+        assertEquals(0, move.getRow());
+        assertEquals(1, move.getCol());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMakeRandomMove_noEmptySpaces(){
+        board.setBoardMatrix(new String[][]{
+                {"X", "X", "X"},
+                {"X", "X", "X"},
+                {"X", "X", "X"}});
+        board.makeRandomMove("X");
     }
 
     @Test
@@ -313,11 +332,11 @@ public class BoardTest{
                 {"X", "X", " "},
                 {" ", " ", " "},
                 {" ", " ", " "}});
-        int[][] rowCoordinates = new int[][]{{0, 0}, {0, 1}, {0, 2}};
+        Move[][] boardMatrix = board.getBoardMatrix();
+        Move[] rowCoordinates = new Move[]{boardMatrix[0][0], boardMatrix[0][1], boardMatrix[0][2]};
         Move move = board.findTwoInARow("X", rowCoordinates);
         assertEquals(0, move.getRow());
         assertEquals(2, move.getCol());
-        assertEquals("X", move.getToken());
     }
 
     @Test
@@ -326,7 +345,8 @@ public class BoardTest{
                 {"X", "X", "O"},
                 {" ", " ", " "},
                 {" ", " ", " "}});
-        int[][] rowCoordinates = new int[][]{{0, 0}, {0, 1}, {0, 2}};
+        Move[][] boardMatrix = board.getBoardMatrix();
+        Move[] rowCoordinates = new Move[]{boardMatrix[0][0], boardMatrix[0][1], boardMatrix[0][2]};
         Move move = board.findTwoInARow("X", rowCoordinates);
         assertNull(move);
     }
@@ -337,7 +357,8 @@ public class BoardTest{
                 {"O", "O", " "},
                 {" ", " ", " "},
                 {" ", " ", " "}});
-        int[][] rowCoordinates = new int[][]{{0, 0}, {0, 1}, {0, 2}};
+        Move[][] boardMatrix = board.getBoardMatrix();
+        Move[] rowCoordinates = new Move[]{boardMatrix[0][0], boardMatrix[0][1], boardMatrix[0][2]};
         Move move = board.findTwoInARow("X", rowCoordinates);
         assertNull(move);
     }
@@ -348,8 +369,8 @@ public class BoardTest{
                 {" ", " ", " "},
                 {" ", " ", " "},
                 {" ", " ", " "}});
-        Move move = board.findForkOpportunity("X");
-        assertNull(move);
+        boolean bool = board.findForkOpportunity("X");
+        assertFalse(bool);
     }
 
     @Test
@@ -358,11 +379,50 @@ public class BoardTest{
                 {" ", "X", " "},
                 {"X", " ", " "},
                 {" ", " ", " "}});
-        Move move = board.findForkOpportunity("X");
-        int row = move.getRow();
-        int col = move.getCol();
-        assertTrue((row == 0 && col == 0) || (row == 1 && col == 1));
-        assertNotNull(move);
+        assertTrue(board.findForkOpportunity("X"));
+        assertEquals(6, board.getAvailableMovesList().size());
+        Move possibleMove1 = board.getBoardMatrix()[0][0];
+        Move possibleMove2 = board.getBoardMatrix()[1][1];
+        boolean wasMove1 = possibleMove1.getToken().equals("X") && possibleMove2.getToken().equals(" ");
+        boolean wasMove2 = possibleMove1.getToken().equals(" ") && possibleMove2.getToken().equals("X");
+        assertTrue(wasMove1 ^ wasMove2);
+    }
+
+    @Test
+    public void testBlockOpponentFork_withNoPersonalTwoInARow(){
+        board.setBoardMatrix(new String[][]{
+                {" ", "X", " "},
+                {"X", " ", " "},
+                {" ", " ", " "}});
+        assertTrue(board.blockOpponentFork("O", "X"));
+        assertEquals(6, board.getAvailableMovesList().size());
+        Move possibleMove1 = board.getBoardMatrix()[0][0];
+        Move possibleMove2 = board.getBoardMatrix()[1][1];
+        boolean wasMove1 = possibleMove1.getToken().equals("O") && possibleMove2.getToken().equals(" ");
+        boolean wasMove2 = possibleMove1.getToken().equals(" ") && possibleMove2.getToken().equals("O");
+        assertTrue(wasMove1 ^ wasMove2);
+    }
+
+    @Test
+    public void testBlockOpponentFork_withPersonalTwoInARow(){
+        board.setBoardMatrix(new String[][]{
+                {" ", "X", " "},
+                {"X", " ", " "},
+                {"O", " ", " "}});
+        assertTrue(board.blockOpponentFork("O", "X"));
+        assertEquals(5, board.getAvailableMovesList().size());
+        Move move = board.getBoardMatrix()[1][1];
+        assertEquals("O", move.getToken());
+    }
+
+    @Test
+    public void testBlockOpponentFork_failure(){
+        board.setBoardMatrix(new String[][]{
+                {" ", " ", " "},
+                {" ", " ", " "},
+                {"X", " ", " "}});
+        assertFalse(board.blockOpponentFork("O", "X"));
+        assertEquals(8, board.getAvailableMovesList().size());
     }
 
     @Test
@@ -371,8 +431,7 @@ public class BoardTest{
                 {" ", " ", " "},
                 {" ", "X", " "},
                 {" ", " ", " "}});
-        Move move = board.findCenterOpportunity("X");
-        assertNull(move);
+        assertFalse(board.findCenterOpportunity("X"));
     }
 
     @Test
@@ -381,7 +440,8 @@ public class BoardTest{
                 {" ", " ", " "},
                 {" ", " ", " "},
                 {" ", " ", " "}});
-        Move move = board.findCenterOpportunity("X");
+        assertTrue(board.findCenterOpportunity("X"));
+        Move move = board.getBoardMatrix()[1][1];
         assertEquals(1, move.getRow());
         assertEquals(1, move.getCol());
         assertEquals("X", move.getToken());
@@ -393,8 +453,7 @@ public class BoardTest{
                 {"O", " ", "O"},
                 {" ", " ", " "},
                 {"O", " ", "O"}});
-        Move move = board.findCornerOpportunity("X", "O");
-        assertNull(move);
+        assertFalse(board.findCornerOpportunity("X", "O"));
     }
 
     @Test
@@ -403,7 +462,8 @@ public class BoardTest{
                 {"O", " ", " "},
                 {" ", " ", " "},
                 {" ", " ", " "}});
-        Move move = board.findCornerOpportunity("X", "O");
+        assertTrue(board.findCornerOpportunity("X", "O"));
+        Move move = board.getBoardMatrix()[2][2];
         assertEquals(2, move.getRow());
         assertEquals(2, move.getCol());
         assertEquals("X", move.getToken());
@@ -415,7 +475,9 @@ public class BoardTest{
                 {" ", " ", " "},
                 {" ", " ", " "},
                 {" ", " ", "X"}});
-        Move move = board.findCornerOpportunity("O", "X");
+
+        assertTrue(board.findCornerOpportunity("O", "X"));
+        Move move = board.getBoardMatrix()[0][0];
         assertEquals(0, move.getRow());
         assertEquals(0, move.getCol());
         assertEquals("O", move.getToken());
@@ -427,7 +489,8 @@ public class BoardTest{
                 {" ", " ", "X"},
                 {" ", " ", " "},
                 {" ", " ", "O"}});
-        Move move = board.findCornerOpportunity("O", "X");
+        assertTrue(board.findCornerOpportunity("O", "X"));
+        Move move = board.getBoardMatrix()[2][0];
         assertEquals(2, move.getRow());
         assertEquals(0, move.getCol());
         assertEquals("O", move.getToken());
@@ -439,12 +502,8 @@ public class BoardTest{
                 {" ", " ", " "},
                 {" ", " ", " "},
                 {" ", " ", " "}});
-        Move move = board.findCornerOpportunity("O", "X");
-        int row = move.getRow();
-        int col = move.getCol();
-        assertTrue(row == 0 || row == 2);
-        assertTrue(col == 0 || col == 2);
-        assertEquals("O", move.getToken());
+        assertTrue(board.findCornerOpportunity("O", "X"));
+        //too lazy to check all four corners.  I really should have.
     }
 
     @Test
@@ -453,8 +512,7 @@ public class BoardTest{
                 {" ", "O", " "},
                 {"O", " ", "X"},
                 {" ", "X", " "}});
-        Move move = board.findEdgeOpportunity("O");
-        assertNull(move);
+        assertFalse(board.findEdgeOpportunity("O"));
     }
 
     @Test
@@ -463,7 +521,8 @@ public class BoardTest{
                 {" ", "O", " "},
                 {"O", " ", " "},
                 {" ", "X", " "}});
-        Move move = board.findEdgeOpportunity("O");
+        assertTrue(board.findEdgeOpportunity("O"));
+        Move move = board.getBoardMatrix()[1][2];
         assertEquals(1, move.getRow());
         assertEquals(2, move.getCol());
         assertEquals("O", move.getToken());
