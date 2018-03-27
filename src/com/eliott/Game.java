@@ -18,7 +18,10 @@ class Game {
     }
 
     boolean moveIsValid(int row, int col) {
-        return row < 3 && row >= 0 && col < 3 && col >= 0 && board.getBoardMatrix()[row][col].getToken().equals(" ");
+        Cell boardCell = board.getBoardMatrix()[row][col];
+        boolean boardCellIsEmpty = boardCell.getToken().equals(board.noToken);
+        boolean coordinatesAreValid =  row < 3 && row >= 0 && col < 3 && col >= 0;
+        return boardCellIsEmpty && coordinatesAreValid;
     }
 
     void makeComputerMove() {
@@ -33,8 +36,8 @@ class Game {
 
     boolean makeManualMove(int row, int col){
         if (moveIsValid(row, col)){
-            Move move = board.getBoardMatrix()[row][col];
-            board.makeMove(move, playerToken);
+            Cell cell = board.getBoardMatrix()[row][col];
+            board.makeMove(cell, playerToken);
             return true;
         } else {
             return false;

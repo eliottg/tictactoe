@@ -67,10 +67,10 @@ public class GameTest {
                 {" ", " ", " "},
                 {"O", " ", " "}});
         game.makeEasyMove();
-        Move winningMove = game.board.getBoardMatrix()[1][0];
-        assertEquals(1, winningMove.getRow());
-        assertEquals(0, winningMove.getCol());
-        assertEquals("O", winningMove.getToken());
+        Cell winningCell = game.board.getBoardMatrix()[1][0];
+        assertEquals(1, winningCell.getRow());
+        assertEquals(0, winningCell.getCol());
+        assertEquals("O", winningCell.getToken());
     }
 
     @Test

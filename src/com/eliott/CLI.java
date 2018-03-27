@@ -48,7 +48,7 @@ class CLI {
     }
 
     private void printBoard(){
-        Move[][] boardMatrix = game.board.getBoardMatrix();
+        Cell[][] boardMatrix = game.board.getBoardMatrix();
         String header = "    1   2   3";
         String highLowSep = "   -----------";
         String row = "%d | %s | %s | %s |";

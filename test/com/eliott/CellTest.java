@@ -6,27 +6,27 @@ import static org.junit.Assert.*;
 /**
  * Created by egray on 2/21/2018.
  */
-public class MoveTest{
+public class CellTest {
 
-    private Move move;
+    private Cell cell;
 
     @Before
     public void setUp() {
-        move = new Move(0, 1, "X");
+        cell = new Cell(0, 1, "X");
     }
 
     @Test
     public void testGetRow() {
-        assertEquals(0, move.getRow());
+        assertEquals(0, cell.getRow());
     }
 
     @Test
     public void testGetCol() {
-        assertEquals(1, move.getCol());
+        assertEquals(1, cell.getCol());
     }
 
     @Test
     public void testGetToken() {
-        assertEquals("X", move.getToken());
+        assertEquals("X", cell.getToken());
     }
 }

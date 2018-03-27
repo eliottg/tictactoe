@@ -87,7 +87,7 @@ import java.util.NoSuchElementException;
 //    public void testGetMoveFromPlayer_valid(){
 //        String testInputString = "2 2";
 //        System.setIn(new ByteArrayInputStream(testInputString.getBytes()));
-//        Move move = CLI.getMoveFromPlayer();
+//        Cell move = CLI.getMoveFromPlayer();
 //        assertNotNull(move);
 //    }
 //
